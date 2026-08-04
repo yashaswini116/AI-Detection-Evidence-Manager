@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Evidence Custody Hub</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #030712;
+            --card-bg: rgba(17, 24, 39, 0.7);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            
+            --primary: #00f0ff;
+            --primary-glow: rgba(0, 240, 255, 0.15);
+            --secondary: #a855f7;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 240, 255, 0.12) 0%, transparent 40%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 50px;
+        }
+
+        /* Container Layout */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header section */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-title h1 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 2rem;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #fff 30%, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 4px;
+        }
+
+        /* Top Statistics Dashboard */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stats-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--theme-color, var(--primary));
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 0 15px var(--theme-glow, var(--primary-glow));
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .stats-info h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .stats-info .value {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1.8rem;
+            color: #fff;
+        }
+
+        .stats-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: var(--theme-color, var(--primary));
+        }
+
+        /* Dashboard Grid Layout */
+        .dashboard-body {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-body {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* UI Card */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .form-control {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        select.form-control option {
+            background: #111827;
+            color: #fff;
+        }
+
+        /* Customized File Input */
+        .file-upload-wrapper {
+            position: relative;
+            width: 100%;
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .file-upload-wrapper:hover {
+            border-color: var(--primary);
+            background: rgba(0, 240, 255, 0.02);
+        }
+
+        .file-upload-wrapper input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload-icon {
+            font-size: 2rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            transition: color 0.3s;
+        }
+
+        .file-upload-wrapper:hover .file-upload-icon {
+            color: var(--primary);
+        }
+
+        .file-upload-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .file-name-preview {
+            display: none;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, #0077ff 100%);
+            color: #000;
+            box-shadow: 0 4px 15px rgba(0, 240, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 240, 255, 0.5);
+            color: #000;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            border-radius: 6px;
+        }
+
+        .btn-danger:hover {
+            background: var(--danger);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-download {
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            border-radius: 6px;
+        }
+
+        .btn-download:hover {
+            background: var(--primary);
+            color: #000;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+        }
+
+        /* Control Panel (Toolbar) */
+        .toolbar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-container {
+            flex: 1;
+            position: relative;
+            min-width: 250px;
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .search-container input {
+            padding-left: 40px;
+        }
+
+        .filter-select {
+            width: 150px;
+        }
+
+        /* Table Design */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-secondary);
+            font-weight: 600;
+            padding: 14px 18px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+            vertical-align: middle;
+            transition: all 0.2s;
+        }
+
+        tr {
+            transition: background-color 0.2s;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Severity Badges */
+        .badge-severity-critical {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.1);
+        }
+        .badge-severity-high {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+        .badge-severity-medium {
+            background: rgba(59, 130, 246, 0.15);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        .badge-severity-low {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        /* Status Badges */
+        .badge-status-secured {
+            background: rgba(16, 185, 129, 0.12);
+            color: #10b981;
+            border-left: 3px solid #10b981;
+            border-radius: 4px;
+        }
+        .badge-status-under-investigation {
+            background: rgba(59, 130, 246, 0.12);
+            color: #3b82f6;
+            border-left: 3px solid #3b82f6;
+            border-radius: 4px;
+        }
+        .badge-status-archived {
+            background: rgba(156, 163, 175, 0.12);
+            color: #9ca3af;
+            border-left: 3px solid #9ca3af;
+            border-radius: 4px;
+        }
+        .badge-status-rejected {
+            background: rgba(239, 68, 68, 0.12);
+            color: #ef4444;
+            border-left: 3px solid #ef4444;
+            border-radius: 4px;
+        }
+
+        /* Categories Icon Badge */
+        .category-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .category-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.03);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            color: var(--primary);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Case ID code styling */
+        .case-code {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: 0.5px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            display: inline-block;
+        }
+
+        .file-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            max-width: 150px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: all 0.3s;
+        }
+
+        .file-link:hover {
+            color: #fff;
+            text-shadow: 0 0 8px var(--primary-glow);
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 6px;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .no-data i {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+            opacity: 0.3;
+        }
+
+        /* Details tooltips or expansion */
+        .desc-text {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: help;
+        }
+
+        .desc-text:hover {
+            white-space: normal;
+            color: var(--text-primary);
+        }
+
+        /* Custom alert notifications */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(17, 24, 39, 0.95);
+            border: 1px solid var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 240, 255, 0.2);
+            color: #fff;
+            padding: 16px 24px;
+            border-radius: 12px;
+            z-index: 1000;
+            transform: translateY(150%);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .notification.show {
+            transform: translateY(0);
+        }
+
+        .notification-icon {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-title">
+                <h1><i class="fa-solid fa-shield-halved"></i> DIGITAL EVIDENCE CUSTODY HUB</h1>
+                <p>Immutable chain of custody for digital forensics management</p>
+            </div>
+            <div>
+                <a href="/report" class="btn btn-secondary" target="_blank">
+                    <i class="fa-solid fa-file-pdf"></i> Generate PDF Report
+                </a>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stats-card" style="--theme-color: var(--primary); --theme-glow: rgba(0, 240, 255, 0.15)">
+                <div class="stats-info">
+                    <h3>Total Evidence</h3>
+                    <div class="value">{{ stats.total_evidence }}</div>
+                </div>
+                <div class="stats-icon"><i class="fa-solid fa-box-archive"></i></div>
+            </div>
+            
+            <div class="stats-card" style="--theme-color: var(--secondary); --theme-glow: rgba(168, 85, 247, 0.15)">
+                <div class="stats-info">
+                    <h3>Active Cases</h3>
+                    <div class="value">{{ stats.unique_cases }}</div>
+                </div>
+                <div class="stats-icon"><i class="fa-solid fa-folder-closed"></i></div>
+            </div>
+
+            <div class="stats-card" style="--theme-color: var(--danger); --theme-glow: rgba(239, 68, 68, 0.15)">
+                <div class="stats-info">
+                    <h3>Critical/High Severity</h3>
+                    <div class="value">{{ stats.critical_count }}</div>
+                </div>
+                <div class="stats-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            </div>
+
+            <div class="stats-card" style="--theme-color: var(--success); --theme-glow: rgba(16, 185, 129, 0.15)">
+                <div class="stats-info">
+                    <h3>Secured Evidence</h3>
+                    <div class="value">{{ stats.secured_count }}</div>
+                </div>
+                <div class="stats-icon"><i class="fa-solid fa-lock"></i></div>
+            </div>
+        </div>
+
+        <!-- Dashboard Body Layout -->
+        <div class="dashboard-body">
+            <!-- Left Panel: Ingest Form -->
+            <div class="glass-card">
+                <div class="card-header">
+                    <h2><i class="fa-solid fa-file-import"></i> Upload Evidence</h2>
+                </div>
+                <form action="/upload" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="case_id">Case ID / Reference</label>
+                        <input type="text" id="case_id" name="case_id" class="form-control" placeholder="e.g. CASE-2026-004A" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="staff_name">Custodian / Officer</label>
+                        <input type="text" id="staff_name" name="staff_name" class="form-control" placeholder="e.g. Agent J. Kizito" required>
+                    </div>
+
+                    <div class="form-row" style="display: flex; gap: 10px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="category">Category</label>
+                            <select id="category" name="category" class="form-control">
+                                <option value="Document">Document</option>
+                                <option value="Image">Image</option>
+                                <option value="Audio">Audio</option>
+                                <option value="Video">Video</option>
+                                <option value="Logs">Logs / System</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="severity">Severity</label>
+                            <select id="severity" name="severity" class="form-control">
+                                <option value="Low">Low</option>
+                                <option value="Medium" selected>Medium</option>
+                                <option value="High">High</option>
+                                <option value="Critical">Critical</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">Initial Status</label>
+                        <select id="status" name="status" class="form-control">
+                            <option value="Under Investigation" selected>Under Investigation</option>
+                            <option value="Secured">Secured (ReadOnly)</option>
+                            <option value="Archived">Archived</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Item Description & Context</label>
+                        <textarea id="description" name="description" class="form-control" rows="3" placeholder="Provide details regarding the source and content..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Evidence File Payload</label>
+                        <div class="file-upload-wrapper">
+                            <i class="fa-solid fa-cloud-arrow-up file-upload-icon"></i>
+                            <div class="file-upload-text">Drag & drop or Click to browse</div>
+                            <input type="file" id="file" name="file" required onchange="handleFileSelected(this)">
+                            <div id="file-name" class="file-name-preview"></div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block" style="margin-top: 10px;">
+                        <i class="fa-solid fa-shield-plus"></i> Ingest Evidence
+                    </button>
+                </form>
+            </div>
+
+            <!-- Right Panel: Inventory & Filters -->
+            <div class="glass-card">
+                <div class="card-header">
+                    <h2><i class="fa-solid fa-list-check"></i> Evidence Inventory</h2>
+                </div>
+                
+                <!-- Filter Toolbar -->
+                <div class="toolbar">
+                    <div class="search-container">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search case ID, description, officer..." onkeyup="filterInventory()">
+                    </div>
+                    
+                    <select id="categoryFilter" class="form-control filter-select" onchange="filterInventory()">
+                        <option value="">All Categories</option>
+                        <option value="Document">Document</option>
+                        <option value="Image">Image</option>
+                        <option value="Audio">Audio</option>
+                        <option value="Video">Video</option>
+                        <option value="Logs">Logs / System</option>
+                        <option value="Other">Other</option>
+                    </select>
+
+                    <select id="severityFilter" class="form-control filter-select" onchange="filterInventory()">
+                        <option value="">All Severities</option>
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                        <option value="Critical">Critical</option>
+                    </select>
+
+                    <select id="statusFilter" class="form-control filter-select" onchange="filterInventory()">
+                        <option value="">All Statuses</option>
+                        <option value="Under Investigation">Under Investigation</option>
+                        <option value="Secured">Secured</option>
+                        <option value="Archived">Archived</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                </div>
+
+                <!-- Table Content -->
+                <div class="table-responsive">
+                    <table id="evidenceTable">
+                        <thead>
+                            <tr>
+                                <th>Case ID</th>
+                                <th>Category</th>
+                                <th>Severity</th>
+                                <th>Details</th>
+                                <th>Payload File</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if evidence %}
+                                {% for item in evidence %}
+                                    <tr data-category="{{ item.category }}" data-severity="{{ item.severity }}" data-status="{{ item.status }}">
+                                        <td><span class="case-code">{{ item.case_id }}</span></td>
+                                        <td>
+                                            <div class="category-wrapper">
+                                                <div class="category-icon">
+                                                    {% if item.category == 'Document' %}
+                                                        <i class="fa-solid fa-file-lines"></i>
+                                                    {% elif item.category == 'Image' %}
+                                                        <i class="fa-solid fa-file-image"></i>
+                                                    {% elif item.category == 'Audio' %}
+                                                        <i class="fa-solid fa-file-audio"></i>
+                                                    {% elif item.category == 'Video' %}
+                                                        <i class="fa-solid fa-file-video"></i>
+                                                    {% elif item.category == 'Logs' %}
+                                                        <i class="fa-solid fa-file-code"></i>
+                                                    {% else %}
+                                                        <i class="fa-solid fa-folder-open"></i>
+                                                    {% endif %}
+                                                </div>
+                                                <span>{{ item.category }}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-severity-{{ item.severity | lower }}">
+                                                <i class="fa-solid fa-circle" style="font-size: 0.45rem;"></i> {{ item.severity }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="desc-text" title="{{ item.description }}">{{ item.description }}</div>
+                                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">
+                                                Officer: {{ item.staff_name }} | {{ item.uploaded_at }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <a href="/uploads/{{ item.filename }}" target="_blank" class="file-link" title="{{ item.filename }}">
+                                                <i class="fa-solid fa-paperclip"></i> {{ item.filename }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-status-{{ item.status | lower | replace(' ', '-') }}">
+                                                {{ item.status }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="actions-cell">
+                                                <a href="/uploads/{{ item.filename }}" download class="btn-download" title="Download payload">
+                                                    <i class="fa-solid fa-download"></i>
+                                                </a>
+                                                <button onclick="confirmDelete('{{ item.id }}', '{{ item.case_id }}')" class="btn-danger" title="Delete record">
+                                                    <i class="fa-solid fa-trash-can"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr class="no-data">
+                                    <td colspan="7">
+                                        <div style="padding: 30px;">
+                                            <i class="fa-solid fa-database" style="font-size: 2.5rem; opacity: 0.3; margin-bottom: 12px; display: block;"></i>
+                                            <p>No digital evidence has been ingested yet.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="notification">
+        <i class="fa-solid fa-circle-check notification-icon" id="toast-icon"></i>
+        <span id="toast-msg">Database refreshed successfully.</span>
+    </div>
+
+    <!-- Delete Confirmation Script -->
+    <script>
+        function handleFileSelected(input) {
+            const preview = document.getElementById('file-name');
+            if (input.files && input.files[0]) {
+                preview.textContent = "Selected: " + input.files[0].name;
+                preview.style.display = "block";
+            } else {
+                preview.style.display = "none";
+            }
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const messageSpan = document.getElementById('toast-msg');
+
+            messageSpan.textContent = msg;
+            if (isError) {
+                icon.className = "fa-solid fa-circle-xmark notification-icon";
+                icon.style.color = "var(--danger)";
+                toast.style.borderColor = "var(--danger)";
+            } else {
+                icon.className = "fa-solid fa-circle-check notification-icon";
+                icon.style.color = "var(--primary)";
+                toast.style.borderColor = "var(--primary)";
+            }
+
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        async function confirmDelete(id, caseId) {
+            if (confirm(`CRITICAL WARNING: Are you sure you want to delete evidence item under Case ID "${caseId}"? This will purge it from the registry and disk.`)) {
+                try {
+                    const response = await fetch(`/evidence/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        showToast("Evidence record purged successfully.");
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    } else {
+                        const errorData = await response.json();
+                        showToast(errorData.detail || "Purge execution failed.", true);
+                    }
+                } catch (e) {
+                    showToast("Error communicating with servers.", true);
+                }
+            }
+        }
+
+        function filterInventory() {
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            const catVal = document.getElementById('categoryFilter').value;
+            const sevVal = document.getElementById('severityFilter').value;
+            const statVal = document.getElementById('statusFilter').value;
+
+            const rows = document.querySelectorAll("#evidenceTable tbody tr");
+
+            rows.forEach(row => {
+                if (row.classList.contains('no-data')) return;
+
+                const text = row.innerText.toLowerCase();
+                const cat = row.getAttribute('data-category');
+                const sev = row.getAttribute('data-severity');
+                const stat = row.getAttribute('data-status');
+
+                const matchesSearch = text.includes(searchVal);
+                const matchesCategory = !catVal || cat === catVal;
+                const matchesSeverity = !sevVal || sev === sevVal;
+                const matchesStatus = !statVal || stat === statVal;
+
+                if (matchesSearch && matchesCategory && matchesSeverity && matchesStatus) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+        
+        // Mouse glow tracking effect
+        document.addEventListener("mousemove", e => {
+            document.body.style.background = `
+                radial-gradient(circle at ${e.clientX}px ${e.clientY}px, rgba(0, 240, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 10% 20%, rgba(168, 85, 247, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 90% 80%, rgba(0, 240, 255, 0.08) 0%, transparent 45%)
+            `;
+            document.body.style.backgroundColor = "var(--bg-color)";
+        });
+    </script>
+</body>
+</html>

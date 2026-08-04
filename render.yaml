@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: ai-detection-evidence-manager
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+    disk:
+      name: evidence-data
+      mountPath: /opt/render/project/src
+      sizeGB: 1
